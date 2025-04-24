@@ -1,0 +1,86 @@
+CREATE TABLE sales (
+    sale_id INT PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    sale_date DATE NOT NULL
+);
+
+INSERT INTO sales (sale_id, product_name, quantity, price, sale_date) VALUES
+(1, 'Apple', 10, 1.20, '2025-04-01'),
+(2, 'Banana', 15, 0.50, '2025-04-01'),
+...
+(20, 'Fish', 5, 4.50, '2025-04-10');
+
+
+SELECT product_name, SUM(quantity) AS total_quantity, AVG(price) AS average_price
+FROM sales
+WHERE sale_date >= '2025-04-01' AND sale_date <= '2025-04-10'
+GROUP BY product_name
+ORDER BY total_quantity DESC;
+
+
+SELECT product_name, quantity
+FROM sales
+WHERE quantity > (
+    SELECT AVG(quantity)
+    FROM sales
+);
+
+SELECT product_name, SUM(quantity) AS total_quantity, AVG(price) AS avg_price
+FROM sales
+GROUP BY product_name;
+
+CREATE TABLE products (
+    product_name VARCHAR(255) PRIMARY KEY,
+    product_category VARCHAR(255)
+);
+
+INSERT INTO products (product_name, product_category) VALUES
+('Apple', 'Fruits'),
+('Banana', 'Fruits'),
+...
+('Fish', 'Meat');
+
+SELECT s.sale_id, s.product_name, p.product_category, s.quantity, s.price
+FROM sales s
+INNER JOIN products p ON s.product_name = p.product_name;
+
+INSERT INTO sales (sale_id, product_name, quantity, price, sale_date)
+VALUES (21, 'Avocado', 3, 120.00, '2025-04-24');
+
+SELECT s.sale_id, s.product_name, p.product_category
+FROM sales s
+LEFT JOIN products p ON s.product_name = p.product_name;
+
+SELECT s.sale_id, s.product_name, p.product_category
+FROM sales s
+LEFT JOIN products p ON s.product_name = p.product_name;
+
+SELECT * FROM product_sales_summary
+ORDER BY total_revenue DESC;
+
+SELECT 
+    p.product_name,
+    SUM(s.quantity) AS total_quantity_sold
+FROM sales s
+LEFT JOIN products p ON s.product_name = p.product_name
+GROUP BY p.product_name
+ORDER BY total_quantity_sold DESC
+LIMIT 10;
+
+SELECT 
+    p.product_category,
+    SUM(s.quantity * s.price) AS category_revenue
+FROM sales s
+LEFT JOIN products p ON s.product_name = p.product_name
+GROUP BY p.product_category
+ORDER BY category_revenue DESC;
+
+SELECT 
+    DATE(s.sale_date) AS sale_date,
+    SUM(s.quantity * s.price) AS total_revenue
+FROM sales s
+GROUP BY sale_date
+ORDER BY sale_date;
+
